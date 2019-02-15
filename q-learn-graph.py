@@ -1,3 +1,14 @@
+'''
+A simple environment appropriate for traditional Q-Learning. 
+The agent gradually builds a Q-Table which maps states and actions to predict possible future reward, based on its experience
+navigating the environment. The state is represented by an index in a vector, and the reward for every state-action pairing 
+(the reward received from moving from a specific state to another specific state) is encoded in a matrix that in whole is 
+inaccessible to the agent. 
+
+With time and experience, the agent's Q-Table will be tuned more and more to approximate the actual reward matrix as it 
+learns how to navigate the state so as to maximize received reward. 
+'''
+
 import gym
 import numpy as np
 
