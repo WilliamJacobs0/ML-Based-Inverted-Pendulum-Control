@@ -8,4 +8,4 @@ I have also uploaded a presentation on Q-Learning in general and as applied to t
 
 Another, more basic Q-Learning implementation `q-learn-graph.py` is included to show the technique in a very simple form (using a Q-Table) on a very simple problem, details of which can be found in the presentation. 
 
-As inspired by [Keon Kim](https://github.com/keon).
+As inspired by the original [DQN Paper](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) and [Keon Kim](https://github.com/keon).
