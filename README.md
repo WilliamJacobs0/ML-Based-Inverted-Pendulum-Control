@@ -1,4 +1,5 @@
-# Deep-Q-Learning-for-OpenAI-Gym
+# ML-Based-Inverted-Pendulum-Control
+# Deep-Q-Learning-in-OpenAI-Gym
 
 An implementation `cartpole_dqn.py` of reinforcement learning to navigate one of OpenAI's "Gym" environments, [CartPole](https://github.com/openai/gym/wiki/CartPole-v0). 
 
