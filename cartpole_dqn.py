@@ -7,11 +7,12 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 
+#save the weights of our models, if we want
 output_dir = 'model_output/'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-    
+#hyperparameters
 time = 5000
 alpha = .5
 gamma = .8
@@ -20,25 +21,26 @@ batch_size = 32
 #episodes = 300
 n_episodes = 500
 
-env = gym.make('CartPole-v0') #our environment (the pendulum simulation)
 
-state_size = env.observation_space.shape[0] #4
-action_size = env.action_space.n #2
+#Thank you OpenAI Gym for providing us with these easy to use simulations!
+#Make our environment
+env = gym.make('CartPole-v0') 
+state_size = env.observation_space.shape[0] #4 values for state. Cart position, cart velocity, pivot angle, pivot angular velocity 
+action_size = env.action_space.n #2 possible actions... move cart left, or move cart right
 
 observation_space = env.observation_space.shape[0]
 action_space = env.action_space.n
-
 
     
 class Agent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
-        self.memory = deque(maxlen=2000) # double-ended queue; acts like list, but elements can be added/removed from either end
-        self.gamma = 0.95 # decay or discount rate: enables agent to take into account future actions in addition to the immediate ones, but discounted at this rate
-        self.epsilon = 1.0 # exploration rate: how much to act randomly; more initially than later due to epsilon decay
-        self.epsilon_decay = 0.995 # decrease number of random explorations as the agent's performance (hopefully) improves over time
-        self.epsilon_min = 0.01 # minimum amount of random exploration permitted
+        self.memory = deque(maxlen=2000) # Memory module for recording previous experiences 
+        self.gamma = 0.95 # discount rate: used to discount future reward over closer rewards... as the Doors say, the future is uncertain 
+        self.epsilon = 1.0 # exploration rate: the probability that the agent takes random actions for exploration purposes 
+        self.epsilon_decay = 0.995 # decay exploration rate
+        self.epsilon_min = 0.01 # minimum amount of random exploration
         self.learning_rate = 0.001  
         self.model = self._build_model()
         
@@ -53,7 +55,7 @@ class Agent:
         return model
     
     def remember(self, state, action, reward, next_state, done):
-        self.memory.append((state, action, reward, next_state, done)) # list of previous experiences, enabling re-training later
+        self.memory.append((state, action, reward, next_state, done)) # Remember experiences for further training
 
     def act(self, state):
         if np.random.rand() <= self.epsilon: # if acting randomly, take random action
