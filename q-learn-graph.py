@@ -1,12 +1,17 @@
 '''
 A simple environment appropriate for traditional Q-Learning. 
+
 The agent gradually builds a Q-Table which maps states and actions to predict possible future reward, based on its experience
-navigating the environment. The state is represented by an index in a vector, and the reward for every state-action pairing 
-(the reward received from moving from a specific state to another specific state) is encoded in a matrix that in whole is 
-inaccessible to the agent. 
+navigating the environment. The problem itself can be thought of a a sort of maze where state 5 is the goal state (the only state
+that produces reward), but an agent must get to state 5 by moving through other states which alone give no reward or negative reward. 
+Q-Learning implements a value function which rewards future, possible rewards based on previous experience of the agent. 
+
+The state is represented by an index in a vector, and the reward for every state-action pairing 
+(the reward received from moving from a specific state to another specific state) is encoded in a matrix. The agent can only
+learn what the reward given by a particular state/action pair is by performing it.
 
 With time and experience, the agent's Q-Table will be tuned more and more to approximate the actual reward matrix as it 
-learns how to navigate the state so as to maximize received reward. 
+learns how to navigate the environment to maximize received reward. 
 '''
 
 import gym
@@ -50,7 +55,7 @@ for e in range(episodes):
     count = 0
     while not done:
         
-        '''
+'''
 Select one among all possible actions for the current state.
 Using this possible action, consider going to the next state.
 Get maximum Q value for this next state based on all possible actions.
