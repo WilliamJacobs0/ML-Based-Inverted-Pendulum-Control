@@ -55,20 +55,23 @@ class Agent:
         return model
     
     def remember(self, state, action, reward, next_state, done):
-        self.memory.append((state, action, reward, next_state, done)) # Remember experiences for further training
+        # Remember experiences for further training
+        self.memory.append((state, action, reward, next_state, done))
 
     def act(self, state):
+        # Impose an action upon the environment
         if np.random.rand() <= self.epsilon: # if acting randomly, take random action
             return random.randrange(self.action_size)
-        act_values = self.model.predict(state) # if not acting randomly, predict reward value based on current state
-        return np.argmax(act_values[0]) # pick the action that will give the highest reward (i.e., go left or right?)
-
-    def replay(self, batch_size): # method that trains NN with experiences sampled from memory
+        predictions = self.model.predict(state) # if not acting randomly, predict reward value based on current state
+        return np.argmax(predictions[0]) # Compare the predicted reward of going left vs going right and choose the higher one
+    
+    def replay(self, batch_size): 
+        # Experience Replay module as inspired by Minh et al. 
         minibatch = random.sample(self.memory, batch_size) # sample a minibatch from memory
-        for state, action, reward, next_state, done in minibatch: # extract data for each minibatch sample
-            target = reward # if done (boolean whether game ended or not, i.e., whether final state or not), then target = reward
-            if not done: # if not done, then predict future discounted reward
-                target = (reward + self.gamma * # (target) = reward + (discount rate gamma) * 
+        for state, action, reward, next_state, done in minibatch: # unpack data from memory
+            target = reward # if done (whether the game ended here or not), then target = reward
+            if not done: # if not done, then predict future discounted reward using the classic Q-Learning equation
+                target = (reward + self.gamma * # (target) = reward + (discount rate gamma, to discount future rewards) * 
                           np.amax(self.model.predict(next_state)[0])) # (maximum target Q based on future action a')
             target_f = self.model.predict(state) # approximately map current state to future discounted reward
             target_f[0][action] = target
@@ -83,31 +86,30 @@ class Agent:
         self.model.save_weights(name)
 
 
-
 agent = Agent(state_size,action_size)
 done = False
 
 max_score = 0
 print("Episode \t Score \t Epsilon")
-for e in range(n_episodes): # iterate over new episodes of the game
-    state = env.reset() # reset state at start of each new episode of the game
+for e in range(n_episodes): # Begin training loop, iterating over game episodes
+    state = env.reset() # Reset state after each iteration
     state = np.reshape(state, [1, state_size])
 
     avg_reward = np.array([])
     avgr = 0
-    for time in range(5000):  # time represents a frame of the game; goal is to keep pole upright as long as possible up to range, e.g., 500 or 5000 timesteps
-
+    
+    for time in range(5000):  
+        # the upper limit on time is the amount of frames we want one iteration to last, assuming the game does not end beforehand
         env.render()
 
-        action = agent.act(state) # action is either 0 or 1 (move cart left or right); decide on one or other here
-        next_state, reward, done, _ = env.step(action) # agent interacts with env, gets feedback; 4 state data points, e.g., pole angle, cart position        
+        action = agent.act(state) # go left or go right - action is 0 or 1 
+        next_state, reward, done, _ = env.step(action) # agent interacts with environment    
         reward = reward if not done else -10 # reward +1 for each additional frame with pole upright        
         next_state = np.reshape(next_state, [1, state_size])
-        agent.remember(state, action, reward, next_state, done) # remember the previous timestep's state, actions, reward, etc.        
-        state = next_state # set "current state" for upcoming iteration to the current next state
-        
-        
-        if done: # episode ends if agent drops pole or we reach timestep 5000
+        agent.remember(state, action, reward, next_state, done) # engage memory module    
+        state = next_state # set "current state" to the next state
+                
+        if done: # episode ends if agent drops pole or we reach max timestep
             np.append(avg_reward,time)
             if e % 10 == 0:
 ##                print("episode: {}/{}, score: {}, e: {:.2}" # print the episode's score and agent's epsilon
@@ -123,10 +125,8 @@ for e in range(n_episodes): # iterate over new episodes of the game
             break # exit loop
         
     if len(agent.memory) > batch_size:
-        agent.replay(batch_size) # train the agent by replaying the experiences of the episode
+        agent.replay(batch_size) # engage experience-replay module
         
     #if e % 500 == 0:
         #agent.save(output_dir + "weights_" + '{:04d}'.format(e) + ".hdf5")
-    
-    
-'weights_0253.hdf5'
+        # save weights if you get a good model trained :)
